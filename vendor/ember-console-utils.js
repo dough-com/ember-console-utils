@@ -1,22 +1,27 @@
-function lookup(id) {
-  var app = Ember.A(Ember.Namespace.NAMESPACES).find(function(namespace) {
-    return namespace instanceof Ember.Application;
-  });
+Ember.ConsoleUtils = Ember.Object.extend({
+  application: Ember.computed(function() {
+    return Ember.A(Ember.Namespace.NAMESPACES).find(function(namespace) {
+      return namespace instanceof Ember.Application;
+    });
+  }),
 
-  if (!app) {
-    return;
+  viewRegistry: Ember.computed('application.__container__', function() {
+    return this.get('application.__container__').lookup('-view-registry:main') || Ember.View.views;
+  }),
+
+  findView: function(id) {
+    return this.get('viewRegistry')[id];
   }
+})
 
-  var registry = Ember.get(app, '__container__').lookup('-view-registry:main') || Ember.View.views;
-  return registry[id];
-}
+Ember.ConsoleUtils.instance = Ember.ConsoleUtils.create();
 
 HTMLElement.prototype.component = HTMLElement.prototype.view = function() {
   var viewEl = this;
   if (!viewEl.classList.contains('ember-view')) {
     viewEl = $(viewEl).parents('.ember-view:first')[0];
   }
-  return lookup(viewEl.id);
+  return Ember.ConsoleUtils.instance.findView(viewEl.id);
 };
 
 HTMLElement.prototype.controller = function() {
