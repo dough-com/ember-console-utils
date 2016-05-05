@@ -1,9 +1,22 @@
-HTMLElement.prototype.view = function() {
+function lookup(id) {
+  var app = Ember.A(Ember.Namespace.NAMESPACES).find(function(namespace) {
+    return namespace instanceof Ember.Application;
+  });
+
+  if (!app) {
+    return;
+  }
+
+  var registry = Ember.get(app, '__container__').lookup('-view-registry:main') || Ember.View.views;
+  return registry[id];
+}
+
+HTMLElement.prototype.component = HTMLElement.prototype.view = function() {
   var viewEl = this;
   if (!viewEl.classList.contains('ember-view')) {
     viewEl = $(viewEl).parents('.ember-view:first')[0];
   }
-  return Ember.View.views[viewEl.id];
+  return lookup(viewEl.id);
 };
 
 HTMLElement.prototype.controller = function() {
