@@ -9,6 +9,7 @@ Ember.ConsoleUtils = Ember.Object.extend({
     return this.get('application.__container__').lookup('-view-registry:main') || Ember.View.views;
   }),
 
+
   findView: function(id) {
     return this.get('viewRegistry')[id];
   }
@@ -24,18 +25,14 @@ HTMLElement.prototype.component = HTMLElement.prototype.view = function() {
   return Ember.ConsoleUtils.instance.findView(viewEl.id);
 };
 
+HTMLElement.prototype.template = function() {
+  var viewObj = this.view();
+  return Ember.get(viewObj, '_renderNode.lastResult.template.meta.moduleName');
+};
+
 HTMLElement.prototype.controller = function() {
   var viewObj = this.view();
   return viewObj.get('controller');
-};
-
-HTMLElement.prototype.template = function() {
-  var viewObj = this.view(),
-      templateName = viewObj.templateName;
-  if (!templateName) {
-    templateName = viewObj.nearestWithProperty('templateName').templateName;
-  }
-  return templateName;
 };
 
 HTMLElement.prototype.model = function() {
